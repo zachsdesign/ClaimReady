@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Indemnity Period Calculator — Compact + Add Phases</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0f1221; --card:#141833; --ink:#e8ebff; --muted:#aab1d6;
+    --accent:#7c8cfb; --accent-2:#4de3c2; --ring:0 0 0 3px color-mix(in oklab, var(--accent) 30%, transparent);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    background: radial-gradient(1200px 600px at 80% -20%, #1a2050 0%, transparent 60%), var(--bg);
+    color:var(--ink); font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans";
+    line-height:1.35;
+  }
+  .wrap{max-width:1100px; margin-inline:auto; padding:18px 14px 36px;}
+
+  header{display:grid; grid-template-columns: 1fr auto; gap:12px; align-items:center; margin-bottom:10px;}
+  .title{display:flex; align-items:center; gap:10px;}
+  .logo{width:34px;height:34px;border-radius:10px; background:conic-gradient(from 210deg at 60% 40%, var(--accent), #a88bff 25%, #4de3c2 55%, #7c8cfb 85%, var(--accent)); box-shadow:0 8px 24px rgba(124,140,251,.35), inset 0 0 22px rgba(77,227,194,.25);}
+  h1{font-size:1.05rem; margin:0}
+  p.sub{color:var(--muted); margin:.1rem 0 0; font-size:.85rem}
+
+  .toolbar{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end}
+  button{
+    background:linear-gradient(180deg, color-mix(in oklab, var(--accent) 80%, #fff 0%), var(--accent));
+    color:#fff; border:none; border-radius:10px; padding:8px 12px; font-weight:700; cursor:pointer;
+    box-shadow:0 6px 16px rgba(124,140,251,.30);
+  }
+  button.secondary{background:#0e1230; color:var(--ink); border:1px solid #2a2f59; box-shadow:none}
+
+  .card{
+    background:linear-gradient(180deg, color-mix(in oklab, var(--card) 92%, black 8%), var(--card));
+    border:1px solid color-mix(in oklab, var(--card) 85%, white 15%); border-radius:14px; padding:10px 12px; box-shadow:0 8px 26px rgba(10,12,30,.32);
+  }
+  .single{grid-column:1/-1}
+
+  .dol{display:grid; grid-template-columns: auto 180px; gap:10px; align-items:center;}
+  .dol label{font-weight:700}
+  input[type="date"]{width:100%; background:#0e1230; color:var(--ink); border:1px solid #2a2f59; border-radius:10px; padding:8px 10px; outline:none;}
+  input[type="date"]:focus{border-color:var(--accent); box-shadow:var(--ring)}
+
+  .phases{margin-top:10px;}
+  .thead, .row{display:grid; grid-template-columns: 1.6fr 0.9fr 0.9fr 0.6fr; gap:8px; align-items:center;}
+  .thead{color:var(--muted); padding:8px 10px;}
+  .row{padding:8px 10px; border-top:1px solid #2a2f59;}
+  .row:first-child{border-top:none}
+  .phase-name{font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .days{justify-self:end; font-weight:800; padding:6px 10px; border-radius:10px; border:1px dashed #2a2f59; color:var(--accent-2); background:#0b0f28; min-width:72px; text-align:center;}
+
+  .kpi{display:grid; grid-template-columns:auto auto 1fr; align-items:center; gap:10px; padding:10px 12px; margin-top:10px; background:linear-gradient(180deg,#101535,#0d1230); border:1px solid #2a2f59; border-radius:12px;}
+  .dot{width:10px;height:10px;border-radius:50%; background:var(--accent-2); box-shadow:0 0 0 5px color-mix(in oklab, var(--accent-2) 28%, transparent)}
+  .kpi h2{font-size:.95rem; margin:0; color:var(--muted)}
+  .value{font-size:1.4rem; font-weight:900}
+  .note{color:var(--muted); font-size:.85rem; justify-self:end; text-align:right}
+
+  .row .tools{justify-self:end; display:flex; gap:6px}
+  .icon-btn{
+    background:#0e1230; border:1px solid #2a2f59; padding:6px 8px; border-radius:8px; color:var(--ink); cursor:pointer;
+  }
+  @media (max-width:720px){
+    .thead, .row{grid-template-columns: 1.2fr 1fr 1fr auto}
+    .dol{grid-template-columns: 1fr; gap:6px}
+    .note{justify-self:start; text-align:left; margin-top:6px}
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="card">
+      <div class="title">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Indemnity Period Calculator</h1>
+          <p class="sub">Slim, linear layout — with addable phases.</p>
+        </div>
+      </div>
+      <div class="toolbar">
+        <button id="addPhase" type="button">Add Phase</button>
+        <button id="clearAll" class="secondary" type="button">Clear</button>
+        <button id="downloadJSON" type="button">Download JSON</button>
+      </div>
+    </header>
+
+    <section class="card single">
+      <div class="dol">
+        <label for="dateOfLoss">Date of Loss</label>
+        <input type="date" id="dateOfLoss" />
+      </div>
+    </section>
+
+    <section class="card phases single" id="phasesContainer">
+      <div class="thead">
+        <div>Phase</div><div>Start</div><div>End</div><div style="text-align:right">Days</div>
+      </div>
+      <!-- Rows injected by JS -->
+    </section>
+
+    <section class="kpi single">
+      <div class="dot" aria-hidden="true"></div>
+      <div>
+        <h2>Indemnity Period (months)</h2>
+        <div class="value" id="indemnityMonths">0.00</div>
+      </div>
+      <div class="note" id="rangeNote">Range: —</div>
+    </section>
+  </div>
+
+<script>
+(() => {
+  // Initial phases
+  const defaultPhases = [
+    "Investigation by authorities",
+    "Loss adjuster's initial assessment",
+    "Preparation of the claim",
+    "Loss Adjusters Clean Review",
+    "Demolition and Debris Removal",
+    "Construction Documents Preparation",
+    "Local Government Approvals",
+    "Construction Tender",
+    "Construction",
+    "Ordering and Delivering of PM&E",
+    "Installation of PM&E",
+    "Testing of PM&E",
+    "Full Restart of the Business",
+    "Recovery of Pre-Loss Trading Position"
+  ];
+
+  const container = document.getElementById('phasesContainer');
+  const dateOfLossEl = document.getElementById('dateOfLoss');
+  const indemnityMonthsEl = document.getElementById('indemnityMonths');
+  const rangeNoteEl = document.getElementById('rangeNote');
+
+  let phaseCounter = 0;
+
+  function createRow(name){
+    const idx = phaseCounter++;
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.dataset.idx = idx;
+
+    row.innerHTML = `
+      <div class="phase-name" title="${name}">${name}</div>
+      <div><input type="date" class="start" data-idx="${idx}"></div>
+      <div><input type="date" class="end" data-idx="${idx}"></div>
+      <div class="days" id="days-${idx}">0</div>
+    `;
+
+    // add minimal tools (rename/remove) via double-click on name
+    row.querySelector('.phase-name').addEventListener('dblclick', () => {
+      const current = row.querySelector('.phase-name').textContent.trim();
+      const next = prompt('Rename phase:', current);
+      if (next !== null && next.trim() !== '') {
+        row.querySelector('.phase-name').textContent = next.trim();
+        row.querySelector('.phase-name').title = next.trim();
+      }
+    });
+
+    row.querySelector('.start').addEventListener('input', recalc);
+    row.querySelector('.end').addEventListener('input', recalc);
+    container.appendChild(row);
+  }
+
+  function parseDate(v){ return v ? new Date(v + 'T00:00:00') : null; }
+  function daysInclusive(s,e){ return (s && e && e>=s) ? Math.floor((e - s)/86400000) + 1 : 0; }
+  const fmt = d => d ? d.toISOString().slice(0,10) : '—';
+
+  function recalc(){
+    // Per-row days + collect range
+    const starts = [];
+    const ends = [];
+
+    container.querySelectorAll('.row').forEach(row => {
+      const idx = row.dataset.idx;
+      const s = parseDate(row.querySelector('.start').value);
+      const e = parseDate(row.querySelector('.end').value);
+      row.querySelector('.days').textContent = daysInclusive(s,e);
+      if (s) starts.push(s);
+      if (e) ends.push(e);
+    });
+
+    const dol = parseDate(dateOfLossEl.value);
+    if (dol) starts.push(dol);
+
+    const earliestStart = starts.length ? new Date(Math.min(...starts)) : null;
+    const latestEnd = ends.length ? new Date(Math.max(...ends)) : null;
+
+    let months = 0;
+    if (earliestStart && latestEnd && latestEnd >= earliestStart){
+      const totalDays = Math.floor((latestEnd - earliestStart)/86400000) + 1;
+      months = totalDays / 30;
+    }
+    indemnityMonthsEl.textContent = months.toFixed(2);
+    rangeNoteEl.textContent = `Range: ${fmt(earliestStart)} → ${fmt(latestEnd)}`;
+  }
+
+  // Toolbar actions
+  document.getElementById('addPhase').addEventListener('click', () => {
+    const nameInput = prompt('Name for the new phase (e.g., "Permits Follow-up"):', '');
+    const name = (nameInput && nameInput.trim()) ? nameInput.trim() : `Custom Phase ${phaseCounter + 1}`;
+    createRow(name);
+    recalc();
+  });
+
+  document.getElementById('clearAll').addEventListener('click', () => {
+    dateOfLossEl.value = '';
+    container.querySelectorAll('.row input[type="date"]').forEach(i => i.value = '');
+    recalc();
+  });
+
+  document.getElementById('downloadJSON').addEventListener('click', () => {
+    const payload = {
+      dateOfLoss: dateOfLossEl.value || null,
+      phases: Array.from(container.querySelectorAll('.row')).map(row => ({
+        name: row.querySelector('.phase-name').textContent.trim(),
+        start: row.querySelector('.start').value || null,
+        end: row.querySelector('.end').value || null,
+        days: Number(row.querySelector('.days').textContent)
+      })),
+      indemnityPeriodMonths: Number(document.getElementById('indemnityMonths').textContent)
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = Object.assign(document.createElement('a'), {href:url, download:'indemnity_period_result.json'});
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  });
+
+  // Seed default rows
+  defaultPhases.forEach(createRow);
+  // React to Date of Loss changes
+  dateOfLossEl.addEventListener('input', recalc);
+
+  recalc();
+})();
+</script>
+</body>
+</html>
