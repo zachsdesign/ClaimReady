@@ -2,295 +2,569 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Indemnity Period — App</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="dark light" />
+<title>Financial Year • GP, ROGP & GP Sum Insured</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
 <style>
   :root{
-    --bg:#0f1221; --surface:#131735; --elev:#161b3f;
-    --ink:#ecf0ff; --muted:#aab1d6;
-    --accent:#7c8cfb; --mint:#4de3c2;
-    --stroke:#273062; --dash:#33407a;
-    --ring:0 0 0 3px color-mix(in oklab, var(--accent) 35%, transparent);
+    --bg:#0b0f14; --card:#121821; --muted:#92a3ba; --text:#e9f0ff;
+    --accent:#6aa7ff; --accent2:#10b981; --border:#1f2a38; --chip:#162131;
+    --shadow: 0 10px 30px rgba(0,0,0,.35); --radius:16px; --warn:#ffb86b; --danger:#ff6b6b;
   }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#f6f8fb; --card:#ffffff; --text:#101828; --muted:#6b7280; --chip:#f2f4f7; --border:#e5e7eb; --accent:#3866ff; --accent2:#10b981; --shadow:0 10px 30px rgba(16,24,40,.06) }
+  }
+
+  html{-webkit-text-size-adjust:100%;text-rendering:optimizeLegibility}
   *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0; background:radial-gradient(1200px 700px at 100% -20%, #1b2260 0%, transparent 60%), var(--bg);
-    color:var(--ink); font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
-    -webkit-font-smoothing:antialiased; line-height:1.35;
-  }
-  .app{max-width:980px; margin:auto; padding:16px 14px 92px;}
+  html,body{margin:0;padding:0;background:linear-gradient(180deg,var(--bg) 0%, #0b1220 100%);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;}
 
-  .topbar{
-    position:sticky; top:0; z-index:5;
-    background:linear-gradient(180deg, color-mix(in oklab, var(--surface) 92%, black 8%), var(--surface));
-    border:1px solid color-mix(in oklab, var(--surface) 85%, white 15%);
-    border-radius:16px; padding:10px 12px; margin-bottom:12px;
-    box-shadow:0 12px 32px rgba(10,12,30,.35);
-    display:grid; grid-template-columns:1fr auto; gap:10px; align-items:center;
-  }
-  .brand{display:flex; align-items:center; gap:10px}
-  .logo{width:34px;height:34px;border-radius:10px;
-    background:conic-gradient(from 210deg at 60% 40%, var(--accent), #a88bff 25%, var(--mint) 55%, #7c8cfb 85%, var(--accent));
-    box-shadow:0 8px 24px rgba(124,140,251,.35), inset 0 0 22px rgba(77,227,194,.25);
-  }
-  .title{display:flex; flex-direction:column}
-  .title h1{font-size:1.05rem; margin:0}
-  .title .sub{color:var(--muted); font-size:.82rem}
-
-  .actions{display:flex; flex-wrap:wrap; gap:8px}
-  .btn{
-    background:linear-gradient(180deg, color-mix(in oklab, var(--accent) 80%, #fff 0%), var(--accent));
-    color:#fff; border:none; border-radius:10px; padding:8px 12px; font-weight:800; cursor:pointer;
-    box-shadow:0 6px 16px rgba(124,140,251,.30);
-  }
-  .btn.secondary{background:#0e1230; color:var(--ink); border:1px solid var(--stroke); box-shadow:none}
-  .btn.small{padding:6px 10px; font-weight:700; border-radius:9px}
-
-  .card{
-    background:linear-gradient(180deg, color-mix(in oklab, var(--elev) 92%, black 8%), var(--elev));
-    border:1px solid color-mix(in oklab, var(--elev) 85%, white 15%);
-    border-radius:16px; padding:12px; box-shadow:0 10px 28px rgba(10,12,30,.32);
-  }
-  .spacer{height:10px}
-
-  .dol{display:grid; grid-template-columns: 1fr 200px; gap:10px; align-items:center}
-  .dol label{font-weight:800}
-  input[type="date"]{
-    width:100%; background:#0e1230; color:var(--ink);
-    border:1px solid var(--stroke); border-radius:10px; padding:8px 10px; outline:none;
-  }
-  input[type="date"]:focus{border-color:var(--accent); box-shadow:var(--ring)}
-
-  .phases .head, .phases .row{
-    display:grid; gap:8px; align-items:center;
-    grid-template-columns: 1.6fr 1fr 1fr auto auto;
-  }
-  .phases .head{color:var(--muted); padding:6px 8px 8px;}
-  .phases .row{padding:8px; border-top:1px solid var(--dash);}
-  .phases .row:first-of-type{border-top:none}
-  .phase-name{font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:text}
-  .days{
-    justify-self:end; min-width:70px; text-align:center; font-weight:900;
-    padding:6px 10px; border-radius:10px; border:1px dashed var(--dash); background:#0b0f28; color:var(--mint);
-  }
-  .tools{display:flex; gap:6px; justify-self:end}
-  .icon{
-    background:#0e1230; border:1px solid var(--stroke); color:var(--ink);
-    border-radius:9px; padding:6px 8px; cursor:pointer; font-size:.9rem; line-height:1;
-  }
-  .icon:hover{border-color:var(--accent)}
-
-  .footer{position:sticky; bottom:0; z-index:4; margin-top:12px;}
-  .kpi{
-    display:grid; grid-template-columns:auto auto 1fr; align-items:center; gap:12px;
-    padding:12px; border-radius:16px;
-    background:linear-gradient(180deg,#101535,#0c1230); border:1px solid var(--stroke);
-    box-shadow:0 -12px 30px rgba(10,12,30,.45);
-  }
-  .dot{width:10px;height:10px;border-radius:50%; background:var(--mint);
-    box-shadow:0 0 0 6px color-mix(in oklab, var(--mint) 30%, transparent)}
-  .kpi h2{margin:0; color:var(--muted); font-size:.95rem}
-  .kpi .val{font-size:1.5rem; font-weight:900}
-  .kpi .note{color:var(--muted); font-size:.85rem; justify-self:end; text-align:right}
-
-  .fab{
-    position:fixed; right:16px; bottom:20px; z-index:6;
-    border:none; border-radius:50%; width:56px; height:56px;
-    display:grid; place-items:center; font-size:1.4rem; font-weight:900; cursor:pointer;
-    background:linear-gradient(180deg, color-mix(in oklab, var(--accent) 80%, #fff 0%), var(--accent));
-    color:#fff; box-shadow:0 10px 22px rgba(124,140,251,.35);
+  /* Mobile-first: robust wrapping to avoid overlap */
+  body, .wrap, .card, .row, .label, .label-chip, .period-chip, .si-title, .help, h1, h2, .sub, .total-line .k{
+    overflow-wrap:anywhere; word-break:break-word; hyphens:auto;
   }
 
-  @media (max-width:760px){
-    .app{padding:14px 12px 100px}
-    .dol{grid-template-columns:1fr}
-    .phases .head, .phases .row{
-      grid-template-columns: 1.3fr 1fr 1fr auto auto;
+  /* Desktop: prefer normal wrapping (no mid-word breaks) */
+  @media (min-width:1025px){
+    body, .row .label, .help, h1, h2, .si-title{
+      overflow-wrap:break-word; word-break:normal; hyphens:auto;
     }
+  }
+
+  .wrap{max-width:1280px;margin:auto;padding:16px; padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+  @media (min-width:1440px){ .wrap{max-width:1400px} }
+
+  /* Header */
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:8px 0 16px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:10px;min-width:0}
+  .logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#9ad3ff);box-shadow:0 6px 18px rgba(106,167,255,.35)}
+  h1{margin:0;font-size:1.1rem;font-weight:800;letter-spacing:.2px;line-height:1.2}
+  .sub{color:var(--muted);font-size:.92rem;line-height:1.35;max-width:52ch}
+  .fy{display:flex;align-items:center;gap:8px;background:var(--chip);border:1px solid var(--border);border-radius:12px;padding:10px;flex-wrap:wrap}
+  .label-chip{font-size:.85rem;color:var(--muted);background:transparent;border:1px dashed var(--border);padding:6px 10px;border-radius:999px}
+  .fy input[type="date"]{background:#0f1520;border:1px solid var(--border);border-radius:10px;color:var(--text);padding:10px 12px;min-height:46px;font-size:16px}
+  @media (prefers-color-scheme: light){ .fy input[type="date"]{background:#fff}}
+
+  /* Layout */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .full{grid-column:1/-1}
+  @media (max-width:1024px){.grid{grid-template-columns:1fr}}
+
+  /* Sections collapsible on mobile */
+  details.section{border:none}
+  details.section > summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);font-weight:700}
+  details.section > summary::-webkit-details-marker{display:none}
+  .chev{transition:transform .2s ease}
+  details[open] .chev{transform:rotate(90deg)}
+  @media (min-width:1025px){ details.section > summary{display:none} }
+
+  /* Cards */
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .card h2{font-size:1rem;margin:0 0 4px;letter-spacing:.2px;padding:16px 16px 0}
+  .help{color:var(--muted);font-size:.95rem;margin:0 16px 10px;line-height:1.35}
+
+  /* Lists / rows */
+  .list{display:grid;gap:10px;padding:0 16px 16px}
+  .row{display:flex;gap:10px;align-items:center;background:var(--chip);border:1px solid var(--border);border-radius:12px;padding:12px;min-width:0}
+  .row .dot{width:8px;height:8px;border-radius:999px;background:linear-gradient(180deg,#2a3a55,#162131);opacity:.8}
+  .row .label{flex:1;min-width:140px;font-weight:700;line-height:1.25}
+  .row input[type="number"], .row input[type="text"], .row input[type="date"]{
+    appearance:none;-webkit-appearance:none;-moz-appearance:textfield;
+    background:#0f1520;border:1px solid var(--border);color:var(--text);
+    border-radius:10px;padding:12px;min-width:0;min-height:46px;font-size:16px;
+  }
+  @media (prefers-color-scheme: light){ .row input{background:#fff} }
+  .row input::-webkit-outer-spin-button, .row input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0 }
+
+  /* Desktop: allow inputs to grow within columns */
+  @media (min-width:1025px){
+    .row input{width:100%}
+    .row .label{min-width:220px}
+  }
+
+  .badge{margin-left:auto;font-size:.95rem;color:var(--muted);background:transparent;border:1px dashed var(--border);padding:6px 10px;border-radius:999px;white-space:nowrap}
+
+  /* Expense header grid (desktop uses minmax to prevent “smush”) */
+  .exp-head{
+    display:grid;grid-template-columns:minmax(240px,1.4fr) minmax(160px,0.9fr) minmax(120px,0.7fr) minmax(180px,1fr) 110px;gap:12px;
+    color:#c9d6ea;font-size:.82rem;margin:0 16px 6px;opacity:.95
+  }
+  .exp-head div{background:#0e1522;border:1px solid var(--border);border-radius:10px;padding:8px 10px;text-transform:uppercase;letter-spacing:.06em}
+  @media (prefers-color-scheme: light){ .exp-head div{background:#f8fafc} }
+  @media (max-width:900px){.exp-head{display:none}}
+
+  /* Expense rows: match header columns on desktop; stack on mobile */
+  .row.exp{
+    display:grid;
+    grid-template-columns:minmax(240px,1.4fr) minmax(160px,0.9fr) minmax(120px,0.7fr) minmax(180px,1fr) 110px;
+    gap:12px;align-items:center
+  }
+  .row.exp .del{justify-self:end}
+  .sublabel{display:none;color:var(--muted);font-size:.85rem;margin-bottom:4px;line-height:1.2}
+  .field{display:flex;flex-direction:column;min-width:0}
+  .row.exp .field input{width:100%}
+  @media (max-width:900px){
+    .row.exp{display:block}
+    .field{margin-bottom:10px}
+    .sublabel{display:block}
+    .row input{width:100%}
+  }
+
+  .actions{display:flex;gap:8px;flex-wrap:wrap;margin:8px 16px 16px}
+  .btn{appearance:none;border:none;outline:none;cursor:pointer;background:linear-gradient(180deg,#1b2433,#121a27);color:var(--text);border:1px solid var(--border);padding:12px 14px;border-radius:12px;font-weight:800;font-size:16px;transition:transform .04s ease,border-color .2s ease;min-height:46px}
+  .btn:hover{transform:translateY(-1px);border-color:#2a3b55}
+  .btn-primary{background:linear-gradient(180deg,#3a69ff,#2a55e8);border-color:#3a69ff}
+  .btn-danger{background:linear-gradient(180deg,#7c1d1d,#561313);border-color:#7c1d1d}
+  .btn-ghost{background:transparent;border:1px dashed var(--border);color:var(--muted)}
+  .btn-mini{padding:10px 12px;border-radius:10px}
+
+  /* Totals */
+  .totals{display:grid;gap:8px;margin:0 16px 16px}
+  .total-line{display:flex;justify-content:space-between;align-items:center;background:#0e1522;border:1px solid var(--border);border-radius:14px;padding:12px 14px}
+  @media (prefers-color-scheme: light){ .total-line{background:#f8fafc} }
+  .total-line .k{color:var(--muted)} .total-line .v{font-weight:800}
+  .v.green{color:var(--accent2)} .v.amber{color:var(--warn)} .v.white{color:#e9f0ff}
+
+  /* GP & ROGP display */
+  .gp-display{
+    display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;
+    background:linear-gradient(180deg,#122032,#0d1624);border:1px solid var(--border);border-radius:16px;padding:18px;margin:0 16px 16px;
+  }
+  @media (prefers-color-scheme: light){ .gp-display{background:#eef2ff} }
+  .gp-title{font-weight:800;letter-spacing:.2px}
+  .gp-value{font-size:1.6rem;font-weight:900;color:var(--accent2);line-height:1.1}
+  .rogp{display:flex;align-items:center;gap:8px;background:#0f1a2a;border:1px solid var(--border);padding:8px 12px;border-radius:12px;font-weight:800;white-space:nowrap}
+  @media (prefers-color-scheme: light){ .rogp{background:#ecfdf5} }
+
+  /* Budget table: desktop minmax to avoid squeeze */
+  .budget-controls{display:flex;gap:10px;flex-wrap:wrap;margin:8px 16px 10px}
+  .num{width:120px;min-height:46px;font-size:16px}
+  .budget-head{
+    display:grid;grid-template-columns:minmax(220px,0.9fr) minmax(240px,1fr) minmax(260px,1.1fr);gap:12px;color:#c9d6ea;font-size:.82rem;margin:0 16px 6px
+  }
+  .budget-head div{background:#0e1522;border:1px solid var(--border);border-radius:10px;padding:8px 10px;text-transform:uppercase;letter-spacing:.06em}
+  @media (prefers-color-scheme: light){ .budget-head div{background:#f8fafc} }
+  .row.budget{
+    display:grid;grid-template-columns:minmax(220px,0.9fr) minmax(240px,1fr) minmax(260px,1.1fr);
+    gap:12px;align-items:center;margin:0 16px
+  }
+  .row.budget input{font-size:16px;width:100%}
+  .period-chip{font-size:.95rem;color:#b9c7de;background:#0f1a2a;border:1px solid var(--border);padding:8px 12px;border-radius:999px}
+  @media (prefers-color-scheme: light){ .period-chip{background:#eef2ff;color:#475569}}
+  @media (max-width:700px){
+    .budget-head{display:none}
+    .row.budget{grid-template-columns:1fr}
+    .row.budget input{width:100%}
+  }
+
+  /* Sum insured cards */
+  .si-wrap{padding:0 16px 16px}
+  .si-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:12px}
+  .si-card{background:#0f1a2a;border:1px solid var(--border);border-radius:12px;padding:12px}
+  @media (prefers-color-scheme: light){ .si-card{background:#f8fafc}}
+  .si-title{font-size:.95rem;color:#cfe1ff}
+  @media (prefers-color-scheme: light){ .si-title{color:#334155}}
+  .si-value{font-weight:900;font-size:1.2rem;color:var(--accent2);margin-top:6px}
+
+  /* Sticky mobile footer summary */
+  .sticky-bar{
+    position:fixed;left:0;right:0;bottom:0;z-index:50;
+    display:none;gap:12px;align-items:center;justify-content:space-between;
+    background:linear-gradient(180deg,#0f1a2a,#0b0f14);border-top:1px solid var(--border);
+    padding:10px 14px; padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));
+    -webkit-backdrop-filter:saturate(150%) blur(6px); backdrop-filter:saturate(150%) blur(6px);
+  }
+  @media (max-width:900px){ .sticky-bar{display:flex} }
+  .sticky-item{display:flex;flex-direction:column;gap:2px;min-width:0}
+  .sticky-k{color:var(--muted);font-size:.9rem}
+  .sticky-v{font-weight:900}
+  .go-top{margin-left:auto}
+
+  /* Ultra-small iPhones */
+  @media (max-width:390px){
+    h1{font-size:1rem}
+    .gp-value{font-size:1.4rem}
+    .rogp{font-size:.95rem}
+    .row .label{min-width:100px}
+  }
+  @media (max-width:360px){
+    .gp-value{font-size:1.25rem}
+    .rogp{font-size:.9rem}
+    .period-chip{font-size:.85rem}
   }
 </style>
 </head>
 <body>
-  <div class="app">
-    <div class="topbar">
+  <div class="wrap">
+    <header>
       <div class="brand">
         <div class="logo" aria-hidden="true"></div>
-        <div class="title">
-          <h1>Indemnity Period</h1>
-          <span class="sub">Compact, app-style workflow</span>
-        </div>
-      </div>
-      <div class="actions">
-        <button id="addPhase" class="btn small" type="button">+ Phase</button>
-        <button id="clearAll" class="btn small secondary" type="button">Clear</button>
-        <button id="downloadJSON" class="btn small" type="button">Download JSON</button>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="dol">
-        <label for="dol">Date of Loss</label>
-        <input type="date" id="dol">
-      </div>
-    </div>
-
-    <div class="spacer"></div>
-
-    <div class="card phases" id="phases">
-      <div class="head">
-        <div>Phase</div>
-        <div>Start</div>
-        <div>End</div>
-        <div style="text-align:right">Days</div>
-        <div style="text-align:right">Actions</div>
-      </div>
-      <!-- Rows injected -->
-    </div>
-
-    <div class="footer">
-      <div class="kpi">
-        <div class="dot"></div>
         <div>
-          <h2>Indemnity Period (months)</h2>
-          <div class="val" id="months">0.00</div>
+          <h1>Financial Year Inputs</h1>
+          <div class="sub">Figures, Expenses (NCE%), GP & ROGP, and Budgeted Revenue for Sum Insured</div>
         </div>
-        <div class="note" id="rangeNote">Range: —</div>
       </div>
+      <div class="fy">
+        <span class="label-chip">Financial year ending</span>
+        <input id="fyEnd" type="date" aria-label="Financial year ending date" />
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- Figures -->
+      <details class="card section" open>
+        <summary><span>Figures (Amounts)</span><span class="chev">›</span></summary>
+        <div class="help">Enter an amount for each item below.</div>
+        <div id="figList" class="list"></div>
+      </details>
+
+      <!-- Expenses -->
+      <details class="card section" open>
+        <summary><span>Expenses</span><span class="chev">›</span></summary>
+        <div class="help">Add or edit expenses. Enter the Amount and the Non-Continuing Expense percentage (NCE%).</div>
+        <div class="exp-head" aria-hidden="true">
+          <div>Expense name</div><div>Amount</div><div>NCE %</div><div>NCE deduction (calc)</div><div>Action</div>
+        </div>
+        <div id="expList" class="list" aria-live="polite"></div>
+        <div class="actions">
+          <button class="btn btn-primary btn-mini" id="addExpBtn">+ Add expense</button>
+          <button class="btn btn-ghost btn-mini" id="resetExpBtn" title="Restore starter expense list">Reset</button>
+        </div>
+        <div class="totals">
+          <div class="total-line"><div class="k">Total expense amount</div><div class="v green" id="expTotal">$0.00</div></div>
+          <div class="total-line"><div class="k">Total NCE deductions</div><div class="v amber" id="nceTotal">$0.00</div></div>
+        </div>
+      </details>
+
+      <!-- Gross Profit + ROGP -->
+      <section class="card full">
+        <h2>Gross Profit</h2>
+        <div class="gp-display">
+          <div class="gp-title">Gross Profit</div>
+          <div class="gp-value" id="gpValue" aria-live="polite">$0.00</div>
+          <div class="rogp" title="Rate of Gross Profit = Gross Profit ÷ Turnover">
+            ROGP: <span id="rogpValue">0.00%</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Calculated (GP) Sum Insured -->
+      <details class="card section full" open>
+        <summary><span>Calculated (GP) Sum Insured</span><span class="chev">›</span></summary>
+        <div class="help">Enter your first <b>Year end</b> and <b>Budget</b>. Choose how many years to predict; subsequent year ends auto-fill.</div>
+
+        <div class="budget-controls">
+          <label class="label-chip" for="yearsCount">Years to forecast</label>
+          <input id="yearsCount" class="num" type="number" min="2" max="10" step="1" value="4" />
+          <span class="label-chip">Budgeted Revenue</span>
+        </div>
+
+        <div class="budget-head" aria-hidden="true">
+          <div>Year end</div><div>Budget</div><div>Insurance period</div>
+        </div>
+
+        <div id="budgetList"></div>
+
+        <div class="si-wrap">
+          <div class="totals" style="margin:0">
+            <div class="k" style="color:var(--muted)">Sum Insured (uses 2nd & 3rd Year End budgets × ROGP)</div>
+          </div>
+          <div class="si-grid" id="siGrid"></div>
+        </div>
+      </details>
     </div>
   </div>
 
-  <button class="fab" id="fabAdd" aria-label="Add Phase">+</button>
+  <!-- Sticky mobile summary -->
+  <div class="sticky-bar" role="region" aria-label="Quick summary">
+    <div class="sticky-item">
+      <div class="sticky-k">Gross Profit</div>
+      <div class="sticky-v" id="stickyGP">$0.00</div>
+    </div>
+    <div class="sticky-item">
+      <div class="sticky-k">ROGP</div>
+      <div class="sticky-v" id="stickyROGP">0.00%</div>
+    </div>
+    <button class="btn btn-mini go-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">Top</button>
+  </div>
 
 <script>
-(() => {
-  const defaults = [
-    "Investigation by authorities",
-    "Loss adjuster's initial assessment",
-    "Preparation of the claim",
-    "Loss Adjusters Clean Review",
-    "Demolition and Debris Removal",
-    "Construction Documents Preparation",
-    "Local Government Approvals",
-    "Construction Tender",
-    "Construction",
-    "Ordering and Delivering of PM&E",
-    "Installation of PM&E",
-    "Testing of PM&E",
-    "Full Restart of the Business",
-    "Recovery of Pre-Loss Trading Position"
+  /* === JS unchanged from your working build === */
+  const $ = (s, el=document) => el.querySelector(s);
+  const money = (n=0) => (Number(n)||0).toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:2});
+  const toNumber = v => { const n = parseFloat(String(v).replace(/[^0-9.\-]/g,'')); return isNaN(n) ? 0 : n; };
+  const clamp = (n,min,max) => Math.max(min, Math.min(max, n));
+  const pct = (n=0) => (Number.isFinite(n)? n : 0).toLocaleString(undefined,{style:'percent',minimumFractionDigits:2,maximumFractionDigits:2});
+  const addYears = (date, yrs) => { const d = new Date(date); d.setFullYear(d.getFullYear()+yrs); return d; };
+  const addDays = (date, days) => { const d = new Date(date); d.setDate(d.getDate()+days); return d; };
+  const fmt = (d) => { if(!d||isNaN(+d)) return ''; return d.toLocaleDateString(undefined,{day:'2-digit',month:'short',year:'numeric'}); };
+  const isoFromInput = (el) => el?.value || '';
+  const toIso = (d)=>{ if(!d||isNaN(+d)) return ''; const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), da=String(d.getDate()).padStart(2,'0'); return `${y}-${m}-${da}`; };
+
+  const FIGS_DEFAULT = [
+    { key: 'turnover', label: 'Turnover', value: 0 },
+    { key: 'closing_stock', label: 'Closing stock', value: 0 },
+    { key: 'closing_wip', label: 'Closing stock work-in-progress', value: 0 },
+    { key: 'opening_stock', label: 'Opening stock', value: 0 },
+    { key: 'opening_wip', label: 'Opening stock work-in-progress', value: 0 },
+  ];
+  const EXPS_DEFAULT = [
+    { id: crypto.randomUUID(), label:'Purchases', amount:0, nce:0 },
+    { id: crypto.randomUUID(), label:'Inland freight', amount:0, nce:0 },
+    { id: crypto.randomUUID(), label:'Commission', amount:0, nce:0 },
+    { id: crypto.randomUUID(), label:'Electricity', amount:0, nce:0 },
+    { id: crypto.randomUUID(), label:'Propane', amount:0, nce:0 },
+    { id: crypto.randomUUID(), label:'Water', amount:0, nce:0 },
   ];
 
-  const phasesEl = document.getElementById('phases');
-  const dolEl = document.getElementById('dol');
-  const monthsEl = document.getElementById('months');
-  const rangeNoteEl = document.getElementById('rangeNote');
+  const K_FY='fy_end_date_v10', K_FIGS='fy_figs_v10', K_EXPS='fy_exps_v10', K_BUD='fy_budgets_v10', K_YEARS='fy_years_v10';
 
-  let uid = 0;
+  const savedFY = localStorage.getItem(K_FY) || '';
+  let figsState = JSON.parse(localStorage.getItem(K_FIGS) || 'null') || FIGS_DEFAULT;
+  let expsState = JSON.parse(localStorage.getItem(K_EXPS) || 'null') || EXPS_DEFAULT;
+  let yearsCount = clamp(parseInt(localStorage.getItem(K_YEARS) || '4', 10), 2, 10);
+  let budgets = JSON.parse(localStorage.getItem(K_BUD) || 'null') || [];
 
-  function parseDate(v){ return v ? new Date(v + 'T00:00:00') : null; }
-  function daysInclusive(s,e){ return (s && e && e>=s) ? Math.floor((e - s)/86400000) + 1 : 0; }
-  const fmt = d => d ? d.toISOString().slice(0,10) : '—';
+  const fyEl = $('#fyEnd'); fyEl.value = savedFY;
+  fyEl.addEventListener('change', ()=> localStorage.setItem(K_FY, fyEl.value || ''));
 
-  function rowTemplate(name, id){
-    const div = document.createElement('div');
-    div.className = 'row';
-    div.dataset.id = id;
-    div.innerHTML = `
-      <div class="phase-name" title="${name}">${name}</div>
-      <div><input type="date" class="start"></div>
-      <div><input type="date" class="end"></div>
-      <div class="days">0</div>
-      <div class="tools">
-        <button class="icon del" title="Remove">✖</button>
-      </div>
-    `;
-    const nameEl = div.querySelector('.phase-name');
-    nameEl.addEventListener('dblclick', () => {
-      const cur = nameEl.textContent.trim();
-      const next = prompt('Rename phase:', cur);
-      if (next !== null && next.trim() !== ''){
-        nameEl.textContent = next.trim();
-        nameEl.title = next.trim();
+  const figList = $('#figList');
+  function renderFigures(){
+    figList.innerHTML = '';
+    figsState.forEach(item=>{
+      const row = document.createElement('div');
+      row.className='row';
+      row.innerHTML = `
+        <div class="dot" aria-hidden="true"></div>
+        <div class="label" title="${item.label}">${item.label}</div>
+        <input type="number" inputmode="decimal" step="0.01" value="${item.value}"
+               aria-label="${item.label} amount" placeholder="Enter amount" title="Amount for ${item.label}" />
+        <span class="badge" aria-hidden="true">${money(item.value)}</span>
+      `;
+      const input = row.querySelector('input');
+      const badge = row.querySelector('.badge');
+      input.addEventListener('input', e=>{
+        item.value = toNumber(e.target.value);
+        localStorage.setItem(K_FIGS, JSON.stringify(figsState));
+        badge.textContent = money(item.value);
+        updateAllAndSI();
+      });
+      figList.appendChild(row);
+    });
+  }
+
+  const expList = $('#expList');
+  const expTotalEl = $('#expTotal');
+  const nceTotalEl = $('#nceTotal');
+
+  function persistExpenses(){ localStorage.setItem(K_EXPS, JSON.stringify(expsState)); }
+  function totals(){
+    let totalAmt = 0, totalNce = 0;
+    expsState.forEach(e=>{
+      const amt = toNumber(e.amount);
+      const p = clamp(toNumber(e.nce), 0, 100);
+      totalAmt += amt; totalNce += amt * (p/100);
+    });
+    expTotalEl.textContent = money(totalAmt);
+    nceTotalEl.textContent = money(totalNce);
+    return { totalAmt, totalNce };
+  }
+
+  function renderExpenses(){
+    expList.innerHTML = '';
+    expsState.forEach(exp=>{
+      const ded = toNumber(exp.amount) * (clamp(toNumber(exp.nce),0,100)/100);
+      const row = document.createElement('div');
+      row.className='row exp'; row.dataset.id = exp.id;
+      row.innerHTML = `
+        <div class="field">
+          <div class="sublabel">Expense name</div>
+          <input type="text" value="${exp.label}" aria-label="Expense name" placeholder="e.g., Purchases" title="Expense name" />
+        </div>
+        <div class="field">
+          <div class="sublabel">Amount</div>
+          <input type="number" inputmode="decimal" step="0.01" value="${exp.amount}" aria-label="${exp.label} amount" placeholder="0.00" title="Amount" />
+        </div>
+        <div class="field">
+          <div class="sublabel">NCE %</div>
+          <input type="number" inputmode="decimal" step="0.01" value="${exp.nce}" aria-label="${exp.label} NCE percentage" placeholder="0–100" title="Non-Continuing Expense percentage" />
+        </div>
+        <span class="badge" title="Calculated: Amount × NCE%">${money(ded)}</span>
+        <button class="btn btn-danger btn-mini del" title="Remove expense">Delete</button>
+      `;
+      const [nameInput, amtInput, nceInput] = row.querySelectorAll('input');
+      const badge = row.querySelector('.badge');
+      const delBtn = row.querySelector('.del');
+
+      nameInput.addEventListener('input', e=>{
+        exp.label = e.target.value.trim() || exp.label; persistExpenses();
+      });
+      function updateDeduction(){
+        const d = toNumber(exp.amount) * (clamp(toNumber(exp.nce),0,100)/100);
+        badge.textContent = money(d);
       }
+      amtInput.addEventListener('input', e=>{
+        exp.amount = toNumber(e.target.value); persistExpenses(); updateDeduction(); totals(); updateAllAndSI();
+      });
+      nceInput.addEventListener('input', e=>{
+        exp.nce = toNumber(e.target.value); persistExpenses(); updateDeduction(); totals(); updateAllAndSI();
+      });
+      delBtn.addEventListener('click', ()=>{
+        expsState = expsState.filter(x => x.id !== exp.id);
+        persistExpenses(); renderExpenses(); totals(); updateAllAndSI();
+      });
+
+      expList.appendChild(row);
     });
-    div.querySelector('.start').addEventListener('input', recalc);
-    div.querySelector('.end').addEventListener('input', recalc);
-    div.querySelector('.del').addEventListener('click', () => { div.remove(); recalc(); });
-    return div;
+    totals();
   }
 
-  function addPhase(name){
-    const id = ++uid;
-    const row = rowTemplate(name || `Custom Phase ${id}`, id);
-    phasesEl.appendChild(row);
-    return row;
+  const gpValueEl  = $('#gpValue');
+  const rogpValueEl = $('#rogpValue');
+  const stickyGP = $('#stickyGP');
+  const stickyROGP = $('#stickyROGP');
+  const fig = k => toNumber(figsState.find(f=>f.key===k)?.value || 0);
+
+  function computePositive(){ return fig('turnover') + fig('closing_stock') + fig('closing_wip'); }
+  function computeOpening(){ return fig('opening_stock') + fig('opening_wip'); }
+  function computeNce(){ return expsState.reduce((acc,e)=> acc + (toNumber(e.amount) * clamp(toNumber(e.nce),0,100)/100), 0); }
+
+  function updateAll(){
+    const positive = computePositive();
+    const opening  = computeOpening();
+    const nce      = computeNce();
+    const gp       = positive - (opening + nce);
+    gpValueEl.textContent = money(gp);
+    stickyGP.textContent = money(gp);
+
+    const turnover = fig('turnover');
+    const rogp = turnover !== 0 ? (gp / turnover) : 0;
+    const rogpText = turnover !== 0 ? pct(rogp) : '0.00%';
+    rogpValueEl.textContent = rogpText;
+    stickyROGP.textContent = rogpText;
+    return { gp, rogp };
   }
 
-  function recalc(){
-    const starts = [];
-    const ends = [];
+  const yearsCountEl = $('#yearsCount');
+  yearsCountEl.value = yearsCount;
+  yearsCountEl.addEventListener('input', ()=>{
+    yearsCount = clamp(parseInt(yearsCountEl.value||'4',10), 2, 10);
+    localStorage.setItem(K_YEARS, String(yearsCount));
+    ensureBudgetRows(); renderBudgets(); renderSumInsured();
+  });
 
-    phasesEl.querySelectorAll('.row').forEach(row => {
-      const s = parseDate(row.querySelector('.start').value);
-      const e = parseDate(row.querySelector('.end').value);
-      row.querySelector('.days').textContent = daysInclusive(s,e);
-      if (s) starts.push(s);
-      if (e) ends.push(e);
-    });
+  const budgetListEl = $('#budgetList');
+  const siGrid = $('#siGrid');
 
-    const dol = parseDate(dolEl.value);
-    if (dol) starts.push(dol);
-
-    const earliest = starts.length ? new Date(Math.min(...starts)) : null;
-    const latest   = ends.length   ? new Date(Math.max(...ends))   : null;
-
-    let months = 0;
-    if (earliest && latest && latest >= earliest){
-      const totalDays = Math.floor((latest - earliest)/86400000) + 1;
-      months = totalDays / 30;
+  function ensureBudgetRows(){
+    if (budgets.length < yearsCount){
+      const base = budgets[0]?.yearEnd || '';
+      for(let i=budgets.length; i<yearsCount; i++){
+        const yearEnd = base ? toIso(addYears(new Date(base), i)) : '';
+        budgets.push({ yearEnd, amount:0 });
+      }
+    }else if (budgets.length > yearsCount){
+      budgets = budgets.slice(0, yearsCount);
     }
-    monthsEl.textContent = months.toFixed(2);
-    rangeNoteEl.textContent = `Range: ${fmt(earliest)} → ${fmt(latest)}`;
+    localStorage.setItem(K_BUD, JSON.stringify(budgets));
   }
 
-  const addBtn = document.getElementById('addPhase');
-  const fab = document.getElementById('fabAdd');
-  [addBtn, fab].forEach(btn => btn.addEventListener('click', () => {
-    const name = prompt('Name for the new phase:', '');
-    addPhase((name && name.trim()) ? name.trim() : undefined);
-    recalc();
-  }));
+  function periodForYearEnd(iso){
+    if(!iso) return '';
+    const end = new Date(iso);
+    const start = addDays(addYears(end, -1), 1);
+    return `${fmt(start)} → ${fmt(end)}`;
+  }
 
-  document.getElementById('clearAll').addEventListener('click', () => {
-    dolEl.value = '';
-    phasesEl.querySelectorAll('.row input[type="date"]').forEach(i => i.value = '');
-    recalc();
+  function cascadeYearEndsFromBase(){
+    const baseIso = budgets[0]?.yearEnd || '';
+    if(!baseIso) return;
+    for(let i=1;i<budgets.length;i++){
+      budgets[i].yearEnd = toIso(addYears(new Date(baseIso), i));
+    }
+  }
+
+  function renderBudgets(){
+    budgetListEl.innerHTML = '';
+    budgets.forEach((row, idx)=>{
+      const el = document.createElement('div');
+      el.className = 'row budget';
+      el.innerHTML = `
+        <input type="date" value="${row.yearEnd || ''}" aria-label="Year end for row ${idx+1}" />
+        <input type="number" inputmode="decimal" step="0.01" value="${row.amount}" aria-label="Budget amount for row ${idx+1}" placeholder="0.00" />
+        <div class="period-chip">${row.yearEnd ? 'Period: '+periodForYearEnd(row.yearEnd) : 'Period will appear after you pick a Year end'}</div>
+      `;
+      const [dateInput, amtInput] = el.querySelectorAll('input');
+
+      dateInput.addEventListener('change', ()=>{
+        row.yearEnd = isoFromInput(dateInput);
+        if(idx===0){ cascadeYearEndsFromBase(); }
+        localStorage.setItem(K_BUD, JSON.stringify(budgets));
+        renderBudgets();
+        renderSumInsured();
+      });
+
+      amtInput.addEventListener('input', ()=>{
+        row.amount = toNumber(amtInput.value);
+        localStorage.setItem(K_BUD, JSON.stringify(budgets));
+        renderSumInsured();
+      });
+
+      budgetListEl.appendChild(el);
+    });
+  }
+
+  function getB2(){ return toNumber(budgets[1]?.amount || 0); }
+  function getB3(){ return toNumber(budgets[2]?.amount || 0); }
+  function sumInsuredFor(months, rogp){
+    const B2 = getB2(), B3 = getB3();
+    const extraFactor = Math.max(0, (months - 12) / 12); // 12→0, 24→1, 30→1.5, 36→2
+    return rogp * (B2 + B3 * extraFactor);
+  }
+
+  function renderSumInsured(){
+    const { rogp } = updateAll();
+    const periods = [12,15,18,21,24,30,36];
+    siGrid.innerHTML = '';
+    periods.forEach(m=>{
+      const val = sumInsuredFor(m, rogp);
+      const card = document.createElement('div');
+      card.className = 'si-card';
+      card.innerHTML = `<div class="si-title">Indemnity: ${m} months</div><div class="si-value">${money(val)}</div>`;
+      siGrid.appendChild(card);
+    });
+  }
+
+  function updateAllAndSI(){ updateAll(); renderSumInsured(); }
+
+  document.getElementById('addExpBtn').addEventListener('click', ()=>{
+    expsState.push({ id: crypto.randomUUID(), label:'New expense', amount:0, nce:0 });
+    persistExpenses(); renderExpenses(); updateAllAndSI();
+    requestAnimationFrame(()=>{ document.querySelector('#expList .row input[type="text"]:last-of-type')?.focus(); });
   });
 
-  document.getElementById('downloadJSON').addEventListener('click', () => {
-    const payload = {
-      dateOfLoss: dolEl.value || null,
-      phases: Array.from(phasesEl.querySelectorAll('.row')).map(row => ({
-        name: row.querySelector('.phase-name').textContent.trim(),
-        start: row.querySelector('.start').value || null,
-        end: row.querySelector('.end').value || null,
-        days: Number(row.querySelector('.days').textContent)
-      })),
-      indemnityPeriodMonths: Number(document.getElementById('months').textContent),
-      range: document.getElementById('rangeNote').textContent
-    };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = Object.assign(document.createElement('a'), {href:url, download:'indemnity_period_result.json'});
-    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  document.getElementById('resetExpBtn').addEventListener('click', ()=>{
+    if(confirm('Reset expenses to the starter list? This will remove your custom rows.')){
+      expsState = EXPS_DEFAULT.map(e=>({ ...e, id: crypto.randomUUID() }));
+      persistExpenses(); renderExpenses(); updateAllAndSI();
+    }
   });
 
-  defaults.forEach(n => addPhase(n));
-  dolEl.addEventListener('input', recalc);
-  recalc();
-})();
+  (function init(){
+    renderFigures();
+    renderExpenses();
+    if(budgets.length === 0){
+      budgets = Array.from({length: yearsCount}, ()=>({yearEnd:'', amount:0}));
+    }else{
+      ensureBudgetRows();
+    }
+    renderBudgets();
+    updateAllAndSI();
+    if(budgets[0]?.yearEnd){ cascadeYearEndsFromBase(); renderBudgets(); renderSumInsured(); }
+  })();
 </script>
 </body>
 </html>
