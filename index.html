@@ -3,118 +3,169 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Indemnity Period Calculator — Compact + Add Phases</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<title>Indemnity Period — App</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0f1221; --card:#141833; --ink:#e8ebff; --muted:#aab1d6;
-    --accent:#7c8cfb; --accent-2:#4de3c2; --ring:0 0 0 3px color-mix(in oklab, var(--accent) 30%, transparent);
+    --bg:#0f1221; --surface:#131735; --elev:#161b3f;
+    --ink:#ecf0ff; --muted:#aab1d6;
+    --accent:#7c8cfb; --mint:#4de3c2;
+    --stroke:#273062; --dash:#33407a;
+    --ring:0 0 0 3px color-mix(in oklab, var(--accent) 35%, transparent);
   }
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
-    margin:0;
-    background: radial-gradient(1200px 600px at 80% -20%, #1a2050 0%, transparent 60%), var(--bg);
-    color:var(--ink); font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans";
-    line-height:1.35;
+    margin:0; background:radial-gradient(1200px 700px at 100% -20%, #1b2260 0%, transparent 60%), var(--bg);
+    color:var(--ink); font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+    -webkit-font-smoothing:antialiased; line-height:1.35;
   }
-  .wrap{max-width:1100px; margin-inline:auto; padding:18px 14px 36px;}
+  .app{max-width:980px; margin:auto; padding:16px 14px 92px;}
 
-  header{display:grid; grid-template-columns: 1fr auto; gap:12px; align-items:center; margin-bottom:10px;}
-  .title{display:flex; align-items:center; gap:10px;}
-  .logo{width:34px;height:34px;border-radius:10px; background:conic-gradient(from 210deg at 60% 40%, var(--accent), #a88bff 25%, #4de3c2 55%, #7c8cfb 85%, var(--accent)); box-shadow:0 8px 24px rgba(124,140,251,.35), inset 0 0 22px rgba(77,227,194,.25);}
-  h1{font-size:1.05rem; margin:0}
-  p.sub{color:var(--muted); margin:.1rem 0 0; font-size:.85rem}
+  .topbar{
+    position:sticky; top:0; z-index:5;
+    background:linear-gradient(180deg, color-mix(in oklab, var(--surface) 92%, black 8%), var(--surface));
+    border:1px solid color-mix(in oklab, var(--surface) 85%, white 15%);
+    border-radius:16px; padding:10px 12px; margin-bottom:12px;
+    box-shadow:0 12px 32px rgba(10,12,30,.35);
+    display:grid; grid-template-columns:1fr auto; gap:10px; align-items:center;
+  }
+  .brand{display:flex; align-items:center; gap:10px}
+  .logo{width:34px;height:34px;border-radius:10px;
+    background:conic-gradient(from 210deg at 60% 40%, var(--accent), #a88bff 25%, var(--mint) 55%, #7c8cfb 85%, var(--accent));
+    box-shadow:0 8px 24px rgba(124,140,251,.35), inset 0 0 22px rgba(77,227,194,.25);
+  }
+  .title{display:flex; flex-direction:column}
+  .title h1{font-size:1.05rem; margin:0}
+  .title .sub{color:var(--muted); font-size:.82rem}
 
-  .toolbar{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end}
-  button{
+  .actions{display:flex; flex-wrap:wrap; gap:8px}
+  .btn{
     background:linear-gradient(180deg, color-mix(in oklab, var(--accent) 80%, #fff 0%), var(--accent));
-    color:#fff; border:none; border-radius:10px; padding:8px 12px; font-weight:700; cursor:pointer;
+    color:#fff; border:none; border-radius:10px; padding:8px 12px; font-weight:800; cursor:pointer;
     box-shadow:0 6px 16px rgba(124,140,251,.30);
   }
-  button.secondary{background:#0e1230; color:var(--ink); border:1px solid #2a2f59; box-shadow:none}
+  .btn.secondary{background:#0e1230; color:var(--ink); border:1px solid var(--stroke); box-shadow:none}
+  .btn.small{padding:6px 10px; font-weight:700; border-radius:9px}
 
   .card{
-    background:linear-gradient(180deg, color-mix(in oklab, var(--card) 92%, black 8%), var(--card));
-    border:1px solid color-mix(in oklab, var(--card) 85%, white 15%); border-radius:14px; padding:10px 12px; box-shadow:0 8px 26px rgba(10,12,30,.32);
+    background:linear-gradient(180deg, color-mix(in oklab, var(--elev) 92%, black 8%), var(--elev));
+    border:1px solid color-mix(in oklab, var(--elev) 85%, white 15%);
+    border-radius:16px; padding:12px; box-shadow:0 10px 28px rgba(10,12,30,.32);
   }
-  .single{grid-column:1/-1}
+  .spacer{height:10px}
 
-  .dol{display:grid; grid-template-columns: auto 180px; gap:10px; align-items:center;}
-  .dol label{font-weight:700}
-  input[type="date"]{width:100%; background:#0e1230; color:var(--ink); border:1px solid #2a2f59; border-radius:10px; padding:8px 10px; outline:none;}
+  .dol{display:grid; grid-template-columns: 1fr 200px; gap:10px; align-items:center}
+  .dol label{font-weight:800}
+  input[type="date"]{
+    width:100%; background:#0e1230; color:var(--ink);
+    border:1px solid var(--stroke); border-radius:10px; padding:8px 10px; outline:none;
+  }
   input[type="date"]:focus{border-color:var(--accent); box-shadow:var(--ring)}
 
-  .phases{margin-top:10px;}
-  .thead, .row{display:grid; grid-template-columns: 1.6fr 0.9fr 0.9fr 0.6fr; gap:8px; align-items:center;}
-  .thead{color:var(--muted); padding:8px 10px;}
-  .row{padding:8px 10px; border-top:1px solid #2a2f59;}
-  .row:first-child{border-top:none}
-  .phase-name{font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .days{justify-self:end; font-weight:800; padding:6px 10px; border-radius:10px; border:1px dashed #2a2f59; color:var(--accent-2); background:#0b0f28; min-width:72px; text-align:center;}
-
-  .kpi{display:grid; grid-template-columns:auto auto 1fr; align-items:center; gap:10px; padding:10px 12px; margin-top:10px; background:linear-gradient(180deg,#101535,#0d1230); border:1px solid #2a2f59; border-radius:12px;}
-  .dot{width:10px;height:10px;border-radius:50%; background:var(--accent-2); box-shadow:0 0 0 5px color-mix(in oklab, var(--accent-2) 28%, transparent)}
-  .kpi h2{font-size:.95rem; margin:0; color:var(--muted)}
-  .value{font-size:1.4rem; font-weight:900}
-  .note{color:var(--muted); font-size:.85rem; justify-self:end; text-align:right}
-
-  .row .tools{justify-self:end; display:flex; gap:6px}
-  .icon-btn{
-    background:#0e1230; border:1px solid #2a2f59; padding:6px 8px; border-radius:8px; color:var(--ink); cursor:pointer;
+  .phases .head, .phases .row{
+    display:grid; gap:8px; align-items:center;
+    grid-template-columns: 1.6fr 1fr 1fr auto auto;
   }
-  @media (max-width:720px){
-    .thead, .row{grid-template-columns: 1.2fr 1fr 1fr auto}
-    .dol{grid-template-columns: 1fr; gap:6px}
-    .note{justify-self:start; text-align:left; margin-top:6px}
+  .phases .head{color:var(--muted); padding:6px 8px 8px;}
+  .phases .row{padding:8px; border-top:1px solid var(--dash);}
+  .phases .row:first-of-type{border-top:none}
+  .phase-name{font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:text}
+  .days{
+    justify-self:end; min-width:70px; text-align:center; font-weight:900;
+    padding:6px 10px; border-radius:10px; border:1px dashed var(--dash); background:#0b0f28; color:var(--mint);
+  }
+  .tools{display:flex; gap:6px; justify-self:end}
+  .icon{
+    background:#0e1230; border:1px solid var(--stroke); color:var(--ink);
+    border-radius:9px; padding:6px 8px; cursor:pointer; font-size:.9rem; line-height:1;
+  }
+  .icon:hover{border-color:var(--accent)}
+
+  .footer{position:sticky; bottom:0; z-index:4; margin-top:12px;}
+  .kpi{
+    display:grid; grid-template-columns:auto auto 1fr; align-items:center; gap:12px;
+    padding:12px; border-radius:16px;
+    background:linear-gradient(180deg,#101535,#0c1230); border:1px solid var(--stroke);
+    box-shadow:0 -12px 30px rgba(10,12,30,.45);
+  }
+  .dot{width:10px;height:10px;border-radius:50%; background:var(--mint);
+    box-shadow:0 0 0 6px color-mix(in oklab, var(--mint) 30%, transparent)}
+  .kpi h2{margin:0; color:var(--muted); font-size:.95rem}
+  .kpi .val{font-size:1.5rem; font-weight:900}
+  .kpi .note{color:var(--muted); font-size:.85rem; justify-self:end; text-align:right}
+
+  .fab{
+    position:fixed; right:16px; bottom:20px; z-index:6;
+    border:none; border-radius:50%; width:56px; height:56px;
+    display:grid; place-items:center; font-size:1.4rem; font-weight:900; cursor:pointer;
+    background:linear-gradient(180deg, color-mix(in oklab, var(--accent) 80%, #fff 0%), var(--accent));
+    color:#fff; box-shadow:0 10px 22px rgba(124,140,251,.35);
+  }
+
+  @media (max-width:760px){
+    .app{padding:14px 12px 100px}
+    .dol{grid-template-columns:1fr}
+    .phases .head, .phases .row{
+      grid-template-columns: 1.3fr 1fr 1fr auto auto;
+    }
   }
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <header class="card">
-      <div class="title">
+  <div class="app">
+    <div class="topbar">
+      <div class="brand">
         <div class="logo" aria-hidden="true"></div>
-        <div>
-          <h1>Indemnity Period Calculator</h1>
-          <p class="sub">Slim, linear layout — with addable phases.</p>
+        <div class="title">
+          <h1>Indemnity Period</h1>
+          <span class="sub">Compact, app-style workflow</span>
         </div>
       </div>
-      <div class="toolbar">
-        <button id="addPhase" type="button">Add Phase</button>
-        <button id="clearAll" class="secondary" type="button">Clear</button>
-        <button id="downloadJSON" type="button">Download JSON</button>
+      <div class="actions">
+        <button id="addPhase" class="btn small" type="button">+ Phase</button>
+        <button id="clearAll" class="btn small secondary" type="button">Clear</button>
+        <button id="downloadJSON" class="btn small" type="button">Download JSON</button>
       </div>
-    </header>
+    </div>
 
-    <section class="card single">
+    <div class="card">
       <div class="dol">
-        <label for="dateOfLoss">Date of Loss</label>
-        <input type="date" id="dateOfLoss" />
+        <label for="dol">Date of Loss</label>
+        <input type="date" id="dol">
       </div>
-    </section>
+    </div>
 
-    <section class="card phases single" id="phasesContainer">
-      <div class="thead">
-        <div>Phase</div><div>Start</div><div>End</div><div style="text-align:right">Days</div>
-      </div>
-      <!-- Rows injected by JS -->
-    </section>
+    <div class="spacer"></div>
 
-    <section class="kpi single">
-      <div class="dot" aria-hidden="true"></div>
-      <div>
-        <h2>Indemnity Period (months)</h2>
-        <div class="value" id="indemnityMonths">0.00</div>
+    <div class="card phases" id="phases">
+      <div class="head">
+        <div>Phase</div>
+        <div>Start</div>
+        <div>End</div>
+        <div style="text-align:right">Days</div>
+        <div style="text-align:right">Actions</div>
       </div>
-      <div class="note" id="rangeNote">Range: —</div>
-    </section>
+      <!-- Rows injected -->
+    </div>
+
+    <div class="footer">
+      <div class="kpi">
+        <div class="dot"></div>
+        <div>
+          <h2>Indemnity Period (months)</h2>
+          <div class="val" id="months">0.00</div>
+        </div>
+        <div class="note" id="rangeNote">Range: —</div>
+      </div>
+    </div>
   </div>
+
+  <button class="fab" id="fabAdd" aria-label="Add Phase">+</button>
 
 <script>
 (() => {
-  // Initial phases
-  const defaultPhases = [
+  const defaults = [
     "Investigation by authorities",
     "Loss adjuster's initial assessment",
     "Preparation of the claim",
@@ -131,52 +182,57 @@
     "Recovery of Pre-Loss Trading Position"
   ];
 
-  const container = document.getElementById('phasesContainer');
-  const dateOfLossEl = document.getElementById('dateOfLoss');
-  const indemnityMonthsEl = document.getElementById('indemnityMonths');
+  const phasesEl = document.getElementById('phases');
+  const dolEl = document.getElementById('dol');
+  const monthsEl = document.getElementById('months');
   const rangeNoteEl = document.getElementById('rangeNote');
 
-  let phaseCounter = 0;
-
-  function createRow(name){
-    const idx = phaseCounter++;
-    const row = document.createElement('div');
-    row.className = 'row';
-    row.dataset.idx = idx;
-
-    row.innerHTML = `
-      <div class="phase-name" title="${name}">${name}</div>
-      <div><input type="date" class="start" data-idx="${idx}"></div>
-      <div><input type="date" class="end" data-idx="${idx}"></div>
-      <div class="days" id="days-${idx}">0</div>
-    `;
-
-    // add minimal tools (rename/remove) via double-click on name
-    row.querySelector('.phase-name').addEventListener('dblclick', () => {
-      const current = row.querySelector('.phase-name').textContent.trim();
-      const next = prompt('Rename phase:', current);
-      if (next !== null && next.trim() !== '') {
-        row.querySelector('.phase-name').textContent = next.trim();
-        row.querySelector('.phase-name').title = next.trim();
-      }
-    });
-
-    row.querySelector('.start').addEventListener('input', recalc);
-    row.querySelector('.end').addEventListener('input', recalc);
-    container.appendChild(row);
-  }
+  let uid = 0;
 
   function parseDate(v){ return v ? new Date(v + 'T00:00:00') : null; }
   function daysInclusive(s,e){ return (s && e && e>=s) ? Math.floor((e - s)/86400000) + 1 : 0; }
   const fmt = d => d ? d.toISOString().slice(0,10) : '—';
 
+  function rowTemplate(name, id){
+    const div = document.createElement('div');
+    div.className = 'row';
+    div.dataset.id = id;
+    div.innerHTML = `
+      <div class="phase-name" title="${name}">${name}</div>
+      <div><input type="date" class="start"></div>
+      <div><input type="date" class="end"></div>
+      <div class="days">0</div>
+      <div class="tools">
+        <button class="icon del" title="Remove">✖</button>
+      </div>
+    `;
+    const nameEl = div.querySelector('.phase-name');
+    nameEl.addEventListener('dblclick', () => {
+      const cur = nameEl.textContent.trim();
+      const next = prompt('Rename phase:', cur);
+      if (next !== null && next.trim() !== ''){
+        nameEl.textContent = next.trim();
+        nameEl.title = next.trim();
+      }
+    });
+    div.querySelector('.start').addEventListener('input', recalc);
+    div.querySelector('.end').addEventListener('input', recalc);
+    div.querySelector('.del').addEventListener('click', () => { div.remove(); recalc(); });
+    return div;
+  }
+
+  function addPhase(name){
+    const id = ++uid;
+    const row = rowTemplate(name || `Custom Phase ${id}`, id);
+    phasesEl.appendChild(row);
+    return row;
+  }
+
   function recalc(){
-    // Per-row days + collect range
     const starts = [];
     const ends = [];
 
-    container.querySelectorAll('.row').forEach(row => {
-      const idx = row.dataset.idx;
+    phasesEl.querySelectorAll('.row').forEach(row => {
       const s = parseDate(row.querySelector('.start').value);
       const e = parseDate(row.querySelector('.end').value);
       row.querySelector('.days').textContent = daysInclusive(s,e);
@@ -184,57 +240,55 @@
       if (e) ends.push(e);
     });
 
-    const dol = parseDate(dateOfLossEl.value);
+    const dol = parseDate(dolEl.value);
     if (dol) starts.push(dol);
 
-    const earliestStart = starts.length ? new Date(Math.min(...starts)) : null;
-    const latestEnd = ends.length ? new Date(Math.max(...ends)) : null;
+    const earliest = starts.length ? new Date(Math.min(...starts)) : null;
+    const latest   = ends.length   ? new Date(Math.max(...ends))   : null;
 
     let months = 0;
-    if (earliestStart && latestEnd && latestEnd >= earliestStart){
-      const totalDays = Math.floor((latestEnd - earliestStart)/86400000) + 1;
+    if (earliest && latest && latest >= earliest){
+      const totalDays = Math.floor((latest - earliest)/86400000) + 1;
       months = totalDays / 30;
     }
-    indemnityMonthsEl.textContent = months.toFixed(2);
-    rangeNoteEl.textContent = `Range: ${fmt(earliestStart)} → ${fmt(latestEnd)}`;
+    monthsEl.textContent = months.toFixed(2);
+    rangeNoteEl.textContent = `Range: ${fmt(earliest)} → ${fmt(latest)}`;
   }
 
-  // Toolbar actions
-  document.getElementById('addPhase').addEventListener('click', () => {
-    const nameInput = prompt('Name for the new phase (e.g., "Permits Follow-up"):', '');
-    const name = (nameInput && nameInput.trim()) ? nameInput.trim() : `Custom Phase ${phaseCounter + 1}`;
-    createRow(name);
+  const addBtn = document.getElementById('addPhase');
+  const fab = document.getElementById('fabAdd');
+  [addBtn, fab].forEach(btn => btn.addEventListener('click', () => {
+    const name = prompt('Name for the new phase:', '');
+    addPhase((name && name.trim()) ? name.trim() : undefined);
     recalc();
-  });
+  }));
 
   document.getElementById('clearAll').addEventListener('click', () => {
-    dateOfLossEl.value = '';
-    container.querySelectorAll('.row input[type="date"]').forEach(i => i.value = '');
+    dolEl.value = '';
+    phasesEl.querySelectorAll('.row input[type="date"]').forEach(i => i.value = '');
     recalc();
   });
 
   document.getElementById('downloadJSON').addEventListener('click', () => {
     const payload = {
-      dateOfLoss: dateOfLossEl.value || null,
-      phases: Array.from(container.querySelectorAll('.row')).map(row => ({
+      dateOfLoss: dolEl.value || null,
+      phases: Array.from(phasesEl.querySelectorAll('.row')).map(row => ({
         name: row.querySelector('.phase-name').textContent.trim(),
         start: row.querySelector('.start').value || null,
         end: row.querySelector('.end').value || null,
         days: Number(row.querySelector('.days').textContent)
       })),
-      indemnityPeriodMonths: Number(document.getElementById('indemnityMonths').textContent)
+      indemnityPeriodMonths: Number(document.getElementById('months').textContent),
+      range: document.getElementById('rangeNote').textContent
     };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], {type: 'application/json'});
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
     const url = URL.createObjectURL(blob);
     const a = Object.assign(document.createElement('a'), {href:url, download:'indemnity_period_result.json'});
     document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
   });
 
-  // Seed default rows
-  defaultPhases.forEach(createRow);
-  // React to Date of Loss changes
-  dateOfLossEl.addEventListener('input', recalc);
-
+  defaults.forEach(n => addPhase(n));
+  dolEl.addEventListener('input', recalc);
   recalc();
 })();
 </script>
